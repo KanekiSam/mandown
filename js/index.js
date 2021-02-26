@@ -99,24 +99,10 @@ Main.prototype.update = function () {
           </div>`
         );
         Player.pause("bg");
-        $.getJSON("./data/scoreList.json", function (data) {
-          console.log(data);
-          const arr = data || [];
-          arr.push({
-            time,
-            score,
-          });
-          $.ajax({
-            url: "./data/scoreList.json",
-            data: arr,
-            success: function (data) {
-              alert("Project Submitted!");
-            },
-            failure: function () {
-              alert("Error in project submission!");
-            },
-          });
-        });
+        const history = parseInt($("#higher-score").text());
+        if (score > history) {
+          $("#higher-score").text(score);
+        }
       }
       this.people.update();
     }
