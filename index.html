@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/index.css" />
+  </head>
+  <body>
+    <div id="operate-screen">
+      <!-- <img src="./img/bg3.jpeg" alt=""> -->
+      <div class="config" style="display: none">
+        <div class="left-in">
+          <div class="life">
+            <div class="range"></div>
+          </div>
+          <div class="score-inner">积分：<span class="score">0</span></div>
+        </div>
+        <div class="btns">
+          <div class="btn">
+            <img id="openBg" src="./img/声音.png" onclick="toggleBg()" /><img
+              id="closeBg"
+              style="display: none"
+              src="./img/声音关闭.png"
+              onclick="toggleBg()"
+            />
+          </div>
+
+          <div class="btn">
+            <img
+              id="openYx"
+              src="./img/开启音效 (1).png"
+              onclick="toggleYx()"
+            />
+            <img
+              id="closeYx"
+              style="display: none"
+              src="./img/关闭音效.png"
+              onclick="toggleYx()"
+            />
+          </div>
+          <div class="btn">
+            <img id="stop" src="./img/暂停 停止.png" onclick="pauseGame()" />
+            <img
+              id="play"
+              style="display: none"
+              src="./img/暂停.png"
+              onclick="pausePlay()"
+            />
+          </div>
+        </div>
+      </div>
+      <canvas id="game-screen"></canvas>
+      <div class="modalwrapper" id="modal">
+        <div class="modal">
+          <div class="mask"></div>
+          <div class="body">
+            <div class="title">提示</div>
+            <div class="content"></div>
+            <div class="btngroup">
+              <div class="btn" onclick="cancel()">取消</div>
+              <div class="btn" onclick="restart()">再来一局</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="start" onclick="init()">开始</div>
+    </div>
+    <audio id="jump" src="./mp3/jump.mp3"></audio>
+    <audio id="walk" src="./mp3/walk.mp3"></audio>
+    <audio id="gameover" src="./mp3/game over.mp3"></audio>
+    <audio id="bg" src="./mp3/bg.mp3" autoplay="true" loop="true"></audio>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script>
+      const Player = {
+        jump: $("#jump")[0],
+        walk: $("#walk")[0],
+        bg: $("#bg")[0],
+        gameover: $("#gameover")[0],
+        openBg: true,
+        openYx: true,
+      };
+      Player.play = function (name) {
+        if (
+          (name == "bg" && Player.openBg) ||
+          (name != "bg" && Player.openYx)
+        ) {
+          if (Player[name].paused) {
+            Player[name].currentTime = 0;
+            Player[name].play();
+          }
+        }
+      };
+      Player.pause = function (name) {
+        Player[name].pause();
+      };
+      function toggleBg() {
+        Player.openBg = !Player.openBg;
+        if (!Player.openBg) {
+          $("#closeBg").show();
+          $("#openBg").hide();
+          Player.pause("bg");
+        } else {
+          $("#closeBg").hide();
+          $("#openBg").show();
+          Player.play("bg");
+        }
+      }
+      function toggleYx() {
+        if (Player.openYx) {
+          $("#closeYx").show();
+          $("#openYx").hide();
+        } else {
+          $("#closeYx").hide();
+          $("#openYx").show();
+        }
+        Player.openYx = !Player.openYx;
+      }
+      function changeLife(life) {
+        $(".range").css({ width: life + "%" });
+      }
+      function addScore(score) {
+        const prev = $(".score").text();
+        $(".score").text(parseInt(prev) + score);
+      }
+      function setScore(score) {
+        $(".score").text(score);
+      }
+      function getScore(score) {
+        const prev = $(".score").text();
+        return prev;
+      }
+      function replay() {
+        $("#stop").show();
+        $("#play").hide();
+      }
+    </script>
+    <script src="./js/random.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/block.js"></script>
+    <script src="./js/people.js"></script>
+    <script src="./js/index.js"></script>
+    <script>
+      const main = new Main({
+        screenW: 400,
+        screenH: 600,
+        id: "game-screen",
+      });
+      const init = () => {
+        main.init().start();
+        $(".config").show();
+        $("#game-screen").show();
+      };
+      function pauseGame() {
+        main.pause();
+        $("#stop").hide();
+        $("#play").show();
+      }
+      function pausePlay() {
+        main.pausePlay();
+        $("#stop").show();
+        $("#play").hide();
+      }
+      function cancel() {
+        $("#modal").hide();
+        $(".config").hide();
+        $("#game-screen").hide();
+        $(".start").show();
+        replay();
+      }
+      function restart() {
+        setScore(0);
+        main.restart();
+        cancel();
+        $(".config").show();
+        $("#game-screen").show();
+        $(".start").hide();
+        replay();
+      }
+    </script>
+  </body>
+</html>

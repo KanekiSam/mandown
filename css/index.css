@@ -1,0 +1,150 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+#operate-screen {
+  margin: 0 auto;
+  /* border: 1px solid black; */
+  /* text-align: center; */
+  position: relative;
+  display: inline-block;
+  width: 400px;
+  height: 600px;
+  background: url(../img/封面3.jpg);
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#operate-screen canvas {
+  z-index: 1;
+  position: relative;
+}
+#operate-screen .bg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+#operate-screen .start {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+}
+#game-screen {
+  display: none;
+  margin: 0 auto;
+  background-color: #d4f2e7;
+  /* border: 1px solid blue; */
+}
+.modalwrapper {
+  display: none;
+}
+.modal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 22;
+}
+.modal .body {
+  width: 200px;
+  height: 150px;
+  background-color: #fff;
+  z-index: 1;
+  margin-top: 200px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+}
+.modal .title {
+  text-align: center;
+  font-weight: blod;
+  font-size: 15px;
+  height: 30px;
+  line-height: 30px;
+}
+.modal .content {
+  text-align: center;
+  font-size: 14px;
+  float: 1;
+  height: 100%;
+  padding: 10px 15px;
+}
+.modal .mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal .btngroup {
+  display: flex;
+  border-top: 1px solid #efefef;
+}
+.modal .btngroup .btn {
+  width: 50%;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.modal .btngroup .btn:first-child {
+  border-right: 1px solid #efefef;
+}
+.start {
+  position: absolute;
+  bottom: 20px;
+  right: 30px;
+  border-radius: 100%;
+  border: 1px solid black;
+  padding: 15px;
+  background-color: #fff;
+  cursor: pointer;
+  z-index: 2;
+}
+.config {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  z-index: 2;
+}
+.left-in {
+  margin-left: 5px;
+  margin-top: 3px;
+}
+.config .life {
+  width: 150px;
+  height: 15px;
+  border: 1px solid black;
+  border-radius: 15px;
+  overflow: hidden;
+  background: white;
+}
+.config .life .range {
+  height: calc(100% - 1px);
+  box-sizing: border-box;
+  background-color: red;
+}
+.config .btns {
+  margin-right: 5px;
+  margin-top: 3px;
+}
+.config .btns img {
+  width: 28px !important;
+}
+.config .btns .btn {
+  padding: 1px 2px;
+  display: inline-block;
+  background-color: white;
+  border-radius: 100%;
+}

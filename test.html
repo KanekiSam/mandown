@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>free_movement</title>
+    <style type="text/css">
+      #div1 {
+        position: absolute;
+        height: 100px;
+        width: 100px;
+        background: red;
+        border-radius: 100%;
+      }
+    </style>
+    <script type="text/javascript">
+      window.onload = function () {
+        var btn = document.getElementById("btn");
+        var div1 = document.getElementById("div1");
+
+        var Time = null;
+        var speed = 0;
+        btn.onclick = function () {
+          startMove();
+        };
+
+        function startMove() {
+          clearInterval(Time); //clearTnterval(Time)://防止多次点击事件的产生
+          Time = setInterval(function () {
+            console.log(speed);
+            speed += 3;
+            var T = div1.offsetTop + speed;
+            if (T > document.documentElement.clientHeight - div1.offsetHeight) {
+              T = document.documentElement.clientHeight - div1.offsetHeight;
+              speed *= -1;
+              speed *= 0.75;
+            }
+            div1.style.top = T + "px";
+          }, 30);
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <input type="button" value="开始运动" id="btn" />
+    <div id="div1"></div>
+  </body>
+</html>
