@@ -86,6 +86,7 @@ Main.prototype.update = function () {
     if (this.people) {
       this.people.manOn(flag, block);
       if (!this.people.life) {
+        const time = new Date().Format("yyyy-MM-dd HH:mm:ss");
         Player.play("gameover");
         clearInterval(this.timer);
         this.blockFactory && this.blockFactory.end();
@@ -98,6 +99,24 @@ Main.prototype.update = function () {
           </div>`
         );
         Player.pause("bg");
+        $.getJSON("./data/scoreList.json", function (data) {
+          console.log(data);
+          const arr = data || [];
+          arr.push({
+            time,
+            score,
+          });
+          $.ajax({
+            url: "./data/scoreList.json",
+            data: arr,
+            success: function (data) {
+              alert("Project Submitted!");
+            },
+            failure: function () {
+              alert("Error in project submission!");
+            },
+          });
+        });
       }
       this.people.update();
     }

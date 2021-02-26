@@ -212,7 +212,7 @@ function DisappearBlock() {
   this.sy = 227;
 
   this.speedX = -1;
-  this.score = 5;
+  this.score = 30;
   this.timeCount = 60;
 }
 DisappearBlock.prototype = new BlockBase();
@@ -240,12 +240,12 @@ function BlockFactory(img, ctx, update, frameTime, options) {
 }
 BlockFactory.prototype.createBlock = function (x = 0, y = 0, cName) {
   const blockClass = [
-    { name: NormalBlock, code: [1, 0.1] },
-    { name: SpringBlock, code: [2, 0.1] },
-    { name: SpineBlock, code: [3, 0.1] },
-    { name: RunLeftBlock, code: [4, 0.1] },
-    { name: RunRightBlock, code: [5, 0.1] },
-    { name: DisappearBlock, code: [6, 0.5] },
+    { name: NormalBlock, code: [1, 0.3] },
+    { name: SpringBlock, code: [2, 0.12] },
+    { name: SpineBlock, code: [3, 0.12] },
+    { name: RunLeftBlock, code: [4, 0.12] },
+    { name: RunRightBlock, code: [5, 0.12] },
+    { name: DisappearBlock, code: [6, 0.12] },
   ];
   let className = cName;
   if (!className) {
