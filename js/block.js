@@ -36,15 +36,22 @@ BlockBase.prototype.move = function () {
   this.x += this.speedX;
 };
 BlockBase.prototype.checkValid = function () {
-  if (
-    this.y + this.height < 0 ||
-    this.x + this.width < 0 ||
-    this.x > this.options.screenW
-  ) {
+  if (this.y + this.height < 0) {
     this.destroy = true;
+  }
+  if (this.x + this.width < 0 && this.speedX < 0) {
+    this.x = this.options.screenW;
+  }
+  if (this.x - this.options.screenW > 0 && this.speedX > 0) {
+    this.x = -this.width;
   }
 };
 BlockBase.prototype.init = function () {
+  // if (this.speedX < 0) {
+  //   this.x = this.screenW;
+  // } else if (this.speedX > 0) {
+  //   this.x = -this.width;
+  // }
   this.draw();
   this.move();
 };
@@ -56,6 +63,10 @@ BlockBase.prototype.update = function () {
   this.move();
   this.checkValid();
   if (this.isManOn && this.score) {
+    addScore(this.score);
+    this.score = 0;
+  }
+  if (this.isCrashed && this.score) {
     addScore(this.score);
     this.score = 0;
   }
@@ -87,13 +98,13 @@ NormalBlock.prototype = new BlockBase();
 /**弹簧障碍物 */
 function SpringBlock() {
   BlockBase.apply(this, arguments);
-  this.speedX = -2;
+  this.speedX = 2 * Utils.getSign();
   this.action = [
     { sx: 0, sy: 32, height: 23, width: 118 },
     { sx: 0, sy: 58, width: 118, height: 32 },
   ];
   this.currentIndex = 0;
-  this.acspeedY = -60;
+  this.acspeedY = -80;
   this.originY = this.y;
   const current = this.action[this.currentIndex];
   this.width = current.width;
@@ -126,6 +137,7 @@ SpringBlock.prototype.updateEvent = function () {
   if (this.isManOn) {
     this.onAction();
     this.man.changeSpeed({ speedY: -20 });
+    Player.play("duang");
   }
 };
 /**尖刺障碍物 */
@@ -135,7 +147,7 @@ function SpineBlock() {
   this.height = 21;
   this.sx = 0;
   this.sy = 90;
-  this.speedX = -1;
+  // this.speedX = Utils.getSign();
   this.score = -5;
 }
 SpineBlock.prototype = new BlockBase();
@@ -143,6 +155,7 @@ SpineBlock.prototype.decount = function (man) {
   if (this.isManOn) {
     if (this.isManOn && man.life) {
       man.changeLife({ count: 0.1 });
+      Player.play("alarm");
     }
   }
 };
@@ -159,8 +172,7 @@ function RunLeftBlock() {
     { sx: 0, sy: 142, width: 118, height: 27 },
   ];
   this.currentIndex = 0;
-
-  this.speedX = -1;
+  this.speedX = Utils.getSign();
   this.acspeedX = -5;
   this.score = 20;
 }
@@ -177,6 +189,11 @@ RunLeftBlock.prototype.getCurrent = function () {
 RunLeftBlock.prototype.updateBeforeEvent = function () {
   this.getCurrent();
 };
+RunLeftBlock.prototype.updateEvent = function () {
+  if (this.isManOn) {
+    Player.play("lvdai");
+  }
+};
 /**右滚动障碍物 */
 function RunRightBlock() {
   BlockBase.apply(this, arguments);
@@ -185,8 +202,7 @@ function RunRightBlock() {
     { sx: 0, sy: 198, width: 118, height: 27 },
   ];
   this.currentIndex = 0;
-
-  this.speedX = -1;
+  this.speedX = Utils.getSign();
   this.acspeedX = 5;
   this.score = 20;
 }
@@ -203,6 +219,11 @@ RunRightBlock.prototype.getCurrent = function () {
 RunRightBlock.prototype.updateBeforeEvent = function () {
   this.getCurrent();
 };
+RunRightBlock.prototype.updateEvent = function () {
+  if (this.isManOn) {
+    Player.play("lvdai");
+  }
+};
 /**消失障碍物 */
 function DisappearBlock() {
   BlockBase.apply(this, arguments);
@@ -210,10 +231,11 @@ function DisappearBlock() {
   this.height = 26;
   this.sx = 0;
   this.sy = 227;
+  // this.speedX = Utils.getSign();
 
-  this.speedX = -1;
   this.score = 30;
-  this.timeCount = 60;
+  this.timeCount = 20;
+  this.startCount = false;
 }
 DisappearBlock.prototype = new BlockBase();
 DisappearBlock.prototype.updateBeforeEvent = function () {
@@ -223,11 +245,67 @@ DisappearBlock.prototype.updateBeforeEvent = function () {
   if (this.timeCount < 10) {
     this.ctx.globalAlpha = 0.5;
   }
-  this.timeCount -= 1;
+  if (this.startCount) {
+    this.timeCount -= 1;
+  }
 };
 DisappearBlock.prototype.updateEvent = function () {
   this.ctx.globalAlpha = 1;
+  if (this.isManOn) {
+    this.startCount = true;
+  }
 };
+/**小鸟障碍物 */
+function RuningBird() {
+  BlockBase.apply(this, arguments);
+  this.speedX = Utils.getSign() * 2;
+  this.speedY = -4;
+  this.score = 0;
+  this.left = this.options.birdImgs.left;
+  this.right = this.options.birdImgs.right;
+  this.img = this.speedX > 0 ? this.right : this.left;
+  this.destroyImg = this.options.birdImgs.bomb;
+  this.destroy = false;
+  this.width = 60;
+  this.height = 38;
+}
+RuningBird.prototype = new BlockBase();
+RuningBird.prototype.checkValid = function () {
+  if (this.y + this.height < 0 || this.isCrashed) {
+    setTimeout(() => {
+      this.destroy = true;
+    }, this.frameTime * 2);
+    if (this.isCrashed) {
+      this.height = 60;
+      this.img = this.destroyImg;
+      Player.play("bomb");
+    }
+  }
+  if (this.x + this.width < 0 && this.speedX < 0) {
+    this.x = this.options.screenW;
+  }
+  if (this.x - this.options.screenW > 0 && this.speedX > 0) {
+    this.x = -this.width;
+  }
+};
+RuningBird.prototype.manOn = function (man) {
+  this.isCrashed = man.checkCrash({
+    x: this.x + this.speedX,
+    y: this.y + this.speedY,
+    width: this.width,
+    height: this.height,
+    speedY: this.speedY,
+    speedX: this.speedX,
+  });
+  this.man = man;
+};
+RuningBird.prototype.updateEvent = function () {
+  if (this.isCrashed && !this.destroy) {
+    console.log("life: ", this.man.life);
+    this.man.changeLife({ count: 10 });
+  }
+};
+
 /**障碍物工厂 */
 function BlockFactory(img, ctx, update, frameTime, options) {
   this.blocks = [];
@@ -240,16 +318,17 @@ function BlockFactory(img, ctx, update, frameTime, options) {
 }
 BlockFactory.prototype.createBlock = function (x = 0, y = 0, cName) {
   const blockClass = [
-    { name: NormalBlock, code: [1, 0.3] },
-    { name: SpringBlock, code: [2, 0.12] },
-    { name: SpineBlock, code: [3, 0.12] },
-    { name: RunLeftBlock, code: [4, 0.12] },
-    { name: RunRightBlock, code: [5, 0.12] },
-    { name: DisappearBlock, code: [6, 0.12] },
+    { name: NormalBlock, code: [1, 0.2] },
+    { name: SpringBlock, code: [2, 0.2] },
+    { name: SpineBlock, code: [3, 0.1] },
+    { name: RunLeftBlock, code: [4, 0.2] },
+    { name: RunRightBlock, code: [5, 0.1] },
+    { name: DisappearBlock, code: [6, 0.2] },
+    // { name: RuningBird, code: [7, 0.3] },
   ];
   let className = cName;
   if (!className) {
-    let random = new GLRandom(1, 10);
+    let random = new GLRandom(1, 12);
     random.percentage = new Map(blockClass.map((item) => item.code));
     random.range();
     const count = random.create();
@@ -259,7 +338,7 @@ BlockFactory.prototype.createBlock = function (x = 0, y = 0, cName) {
         break;
       }
     }
-    // className = DisappearBlock;
+    // className = RuningBird;
   }
   const { img, ctx, update, frameTime, options } = this;
   const x0 = x || Math.random() * (options.screenW - 200);
@@ -271,7 +350,7 @@ BlockFactory.prototype.createBlock = function (x = 0, y = 0, cName) {
     ctx,
     update,
     frameTime,
-    options
+    options,
   );
   block.init();
   this.blocks.push(block);
@@ -279,17 +358,25 @@ BlockFactory.prototype.createBlock = function (x = 0, y = 0, cName) {
 BlockFactory.prototype.setTimer = function () {
   const diffx = this.options.screenW / 6;
   this.createTimer = setInterval(() => {
-    this.createBlock(diffx * parseInt(Math.random() * 6));
-  }, this.frameTime * 60);
+    this.createBlock(diffx + diffx * parseInt(Math.random() * 4));
+    // const bird = new RuningBird(this);
+    setTimeout(() => {
+      this.createBlock(
+        diffx + diffx * parseInt(Math.random() * 4),
+        0,
+        RuningBird,
+      );
+    }, 50);
+  }, this.frameTime * 50);
 };
 BlockFactory.prototype.start = function () {
   const diffx = this.options.screenW / 6;
   const diffy = this.options.screenH / 4;
   for (let i = 1; i <= 4; i++) {
     this.createBlock(
-      diffx * parseInt(Math.random() * 6),
+      diffx * parseInt(Math.random() * 6) + Utils.getSign() * 20,
       diffy * i,
-      NormalBlock
+      NormalBlock,
     );
   }
   this.setTimer();

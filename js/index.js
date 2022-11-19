@@ -11,20 +11,32 @@ Main.prototype.initPeople = function () {
   const peopleImg = imags.find(function (item) {
     return item.info.type == "people";
   }).img;
-  that.people = new People(
-    that.width / 2,
-    1,
-    peopleImg,
-    that.ctx,
-    that.update,
-    {
+  if (!that.people) {
+    that.people = new People(
+      that.width / 2,
+      1,
+      peopleImg,
+      that.ctx,
+      that.update,
+      {
+        speedX: 12,
+        speedY: 2,
+        frameTime: that.frameTime,
+        screenW: that.width,
+        screenH: that.height,
+      },
+    );
+  } else {
+    that.people.x = that.width / 2;
+    that.people.y = 1;
+    that.people.options = {
       speedX: 12,
       speedY: 2,
       frameTime: that.frameTime,
       screenW: that.width,
       screenH: that.height,
-    }
-  );
+    };
+  }
   that.people.init();
 };
 Main.prototype.initBlock = function () {
@@ -33,13 +45,31 @@ Main.prototype.initBlock = function () {
   const blockImg = imags.find(function (item) {
     return item.info.type == "block";
   }).img;
-
+  const birdImgs = {};
+  imags.forEach((item) => {
+    if (item.info.type == "bird") {
+      if (item.info.url.includes("bird_left")) {
+        birdImgs.left = item.img;
+      }
+      if (item.info.url.includes("bird_right")) {
+        birdImgs.right = item.img;
+      }
+      if (item.info.url.includes("boom2")) {
+        birdImgs.bomb = item.img;
+      }
+    }
+  });
   that.blockFactory = new BlockFactory(
     blockImg,
     that.ctx,
     that.update,
     that.frameTime,
-    { screenH: that.height, screenW: that.width }
+    {
+      screenH: that.height,
+      screenW: that.width,
+      birdImgs: birdImgs,
+      originImgs: imags.filter((item) => item.info.type == "bird"),
+    },
   );
   that.blockFactory.start();
 };
@@ -55,12 +85,15 @@ Main.prototype.init = function () {
     [
       { url: "./img/people3.png", type: "people" },
       { url: "./img/障碍物3.png", type: "block" },
+      { url: "./img/bird_left.png", type: "bird" },
+      { url: "./img/bird_right.png", type: "bird" },
+      { url: "./img/boom2.png", type: "bird" },
     ],
     (imags) => {
       this.imags = imags;
       this.initBlock();
       this.initPeople();
-    }
+    },
   );
   return this;
 };
@@ -96,7 +129,7 @@ Main.prototype.update = function () {
           `<div>
             <div>你已死亡，游戏结束!</div>
             <div>得分：${score}</div>
-          </div>`
+          </div>`,
         );
         Player.pause("bg");
         const history = parseInt($("#higher-score").text());

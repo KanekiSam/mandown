@@ -20,6 +20,22 @@ const Utils = {
     // console.log(typeof img);
     ctx.drawImage(img, sx, sy, swidth, sheight, x, y, width, height);
   },
-  addAnimation: function () {}
-
+  addAnimation: function () {},
+  getSign: function () {
+    const n = parseInt(Math.random() * 2);
+    return n == 1 ? 1 : -1;
+  },
+  throttle:function(actionFunc, timer){
+    let flag = false;
+    return function(...args){
+      if (flag) {
+        return;
+      }
+      flag = true;
+      setTimeout(() => {
+        flag = false;
+      }, timer);
+      actionFunc(args[0]);
+    }
+  }
 };

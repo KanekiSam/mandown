@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <title>free_movement</title>
     <style type="text/css">
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
       #div1 {
         position: absolute;
         height: 100px;
@@ -31,9 +36,9 @@
             var T = div1.offsetTop + speed;
             if (T > document.documentElement.clientHeight - div1.offsetHeight) {
               T = document.documentElement.clientHeight - div1.offsetHeight;
-              speed *= -1;
-              speed *= 0.75;
+              speed *= -0.75;
             }
+            
             div1.style.top = T + "px";
           }, 30);
         }
