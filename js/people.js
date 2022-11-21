@@ -44,9 +44,11 @@ function People(x, y, img, ctx, update, options) {
   this.direction;
   this.life = 100;
   this.bleeding = false;
+  this.invincibleCount = 3; // 无敌状态，避免一出场就判断出上方边界
 }
 People.prototype.init = function () {
   this.life = 100;
+  this.invincibleCount = 3;
   this.changeLife({ life: 100 });
   this.draw();
   this.initEvent();
@@ -317,13 +319,17 @@ People.prototype.onpaused = function () {
 };
 People.prototype.died = function () {
   let flag = false;
-  if (this.y + this.height >= this.options.screenH) {
-    this.y = this.options.screenH - this.height;
-    flag = true;
-  }
-  if (this.y <= 0) {
-    this.y = 0;
-    flag = true;
+  if (this.invincibleCount > 0) {
+    this.invincibleCount -= 1;
+  } else {
+    if (this.y + this.height >= this.options.screenH) {
+      this.y = this.options.screenH - this.height;
+      flag = true;
+    }
+    if (this.y <= 0) {
+      this.y = 0;
+      flag = true;
+    }
   }
   if (flag) {
     this.onpaused();

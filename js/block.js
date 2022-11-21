@@ -138,6 +138,7 @@ SpringBlock.prototype.updateEvent = function () {
     this.onAction();
     this.man.changeSpeed({ speedY: -20 });
     Player.play("duang");
+    this.man.frames = this.man.ups;
   }
 };
 /**尖刺障碍物 */
@@ -290,8 +291,8 @@ RuningBird.prototype.checkValid = function () {
 };
 RuningBird.prototype.manOn = function (man) {
   this.isCrashed = man.checkCrash({
-    x: this.x + this.speedX,
-    y: this.y + this.speedY,
+    x: this.x,
+    y: this.y,
     width: this.width,
     height: this.height,
     speedY: this.speedY,
@@ -358,11 +359,13 @@ BlockFactory.prototype.createBlock = function (x = 0, y = 0, cName) {
 BlockFactory.prototype.setTimer = function () {
   const diffx = this.options.screenW / 6;
   this.createTimer = setInterval(() => {
-    this.createBlock(diffx + diffx * parseInt(Math.random() * 4));
+    this.createBlock(
+      Utils.getSign() * diffx + diffx * parseInt(Math.random() * 4),
+    );
     // const bird = new RuningBird(this);
     setTimeout(() => {
       this.createBlock(
-        diffx + diffx * parseInt(Math.random() * 4),
+        Utils.getSign() * diffx + diffx * parseInt(Math.random() * 4),
         0,
         RuningBird,
       );
@@ -374,7 +377,7 @@ BlockFactory.prototype.start = function () {
   const diffy = this.options.screenH / 4;
   for (let i = 1; i <= 4; i++) {
     this.createBlock(
-      diffx * parseInt(Math.random() * 6) + Utils.getSign() * 20,
+      diffx + diffx * parseInt(Math.random() * 4) + Utils.getSign() * 20,
       diffy * i,
       NormalBlock,
     );

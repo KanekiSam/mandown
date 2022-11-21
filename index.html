@@ -68,9 +68,50 @@
           </div>
         </div>
       </div>
+      <div class="modalwrapper" id="guider">
+        <div class="modal">
+          <div class="mask"></div>
+          <div class="step-wrapper">
+            <div class="step" key="1">
+              <div>左上角有血条和积分，注意查看血条是否健康。</div>
+            </div>
+            <div class="step" key="2">
+              <div>右上角三个按钮可以关闭背景音乐、特效声音、及暂停游戏哦</div>
+            </div>
+            <div class="step" key="3">
+              <div>小心顶部和底部的锯齿哦，被碰到游戏就结束了</div>
+            </div>
+            <div class="step" key="4">
+              <div>
+                绿色草皮可以一直停留，并且会获得10积分，其他障碍物同样可以增加或扣除积分
+              </div>
+            </div>
+            <div class="step" key="5">
+              <div>
+                电脑端上下左右键控制人物移动和跳跃，移动端触摸屏幕滑动控制人物移动和跳跃
+              </div>
+            </div>
+            <img src="./img/ico.png" alt="" />
+            <div class="tool">
+              <div class="prevStep">上一步</div>
+              <div class="nextStep">继续</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="start" onclick="init()">开始</div>
     </div>
     <div class="history">历史最高分：<span id="higher-score">0</span></div>
+    <div class="desc">
+      <h3>本游戏说明</h3>
+      <ul>
+        <li>pc端用上下左右键控制人物行走，手机端可触摸屏幕滑动控制</li>
+        <li>本游戏图片和声音素材均来自网络，开发此游戏仅用来学习</li>
+        <li>
+          <a href="https://github.com/KanekiSam/mandown">我的GitHub源码地址</a>
+        </li>
+      </ul>
+    </div>
     <div class="controlBar" id="controlBar">
       <div class="directionBoll" id="directionBoll"></div>
     </div>
@@ -197,10 +238,63 @@
         screenH: height,
         id: "game-screen",
       });
+      let showGuides = true; // 是否展示指引
       const init = () => {
         main.init().start();
         $(".config").show();
         $("#game-screen").show();
+        if (showGuides) {
+          showGuides = false;
+          setTimeout(() => {
+            pauseGame();
+            $("#guider").show();
+            $(".nextStep").click(() => {
+              let flag;
+              $(".step").map(function () {
+                console.log(this);
+                if (!flag && $(this).css("display") != "none") {
+                  flag = true;
+                  const nextKey = Number($(this).attr("key")) + 1;
+                  const next = $(`.step[key=${nextKey}]`);
+                  if (next) {
+                    $(".prevStep").show();
+                    if (nextKey == 5) {
+                      $(".nextStep").text("开始游戏");
+                    }
+                    if (nextKey == 6) {
+                      pausePlay();
+                      $("#guider").hide();
+                      return;
+                    }
+                    $(this).hide();
+                    next.show();
+                  }
+                }
+              });
+            });
+            $(".prevStep").click(function () {
+              let flag;
+              $(".step").map(function () {
+                console.log(this);
+                if (!flag && $(this).css("display") != "none") {
+                  flag = true;
+                  const prevKey = Number($(this).attr("key")) - 1;
+                  const prev = $(`.step[key=${prevKey}]`);
+                  if (prev) {
+                    if (prevKey == 1) {
+                      $(".prevStep").hide();
+                    }
+                    if (prevKey == 4) {
+                      $(".nextStep").text("继续");
+                    }
+                    $(this).hide();
+                    prev.show();
+                  }
+                }
+              });
+            });
+          }, 500);
+        }
       };
       function pauseGame() {
         main.pause();
